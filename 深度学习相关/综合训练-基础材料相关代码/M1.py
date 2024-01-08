@@ -2,20 +2,24 @@
 
 
 #正向传播函数
+import sys
 import time
+
+import tensorflow as tf
 
 
 def _feedForward(self, keep_prob):
     """ Forward pass """
-    z = [];a = []
+    z = []
+    a = []
     z.append(np.dot(self.W[0], self.X) + self.B[0])
     a.append(PHI[self.ac_funcs[0]](z[-1]))
-    for l in range(1,len(self.layers)):
-    z.append(np.dot(self.W[l], a[-1]) + self.B[l])
-    # a.append(PHI[self.ac_funcs[l]](z[l]))
-    _a = PHI[self.ac_funcs[l]](z[l])
-    a.append( ((np.random.rand(_a.shape[0],1) < keep_prob)*_a)/keep_prob )
-    return z,a
+    for l in range(1, len(self.layers)):
+        z.append(np.dot(self.W[l], a[-1]) + self.B[l])
+        # a.append(PHI[self.ac_funcs[l]](z[l]))
+        _a = PHI[self.ac_funcs[l]](z[l])
+        a.append(((np.random.rand(_a.shape[0], 1) < keep_prob) * _a) / keep_prob)
+    return z, a
 
 #反向传播函数
 def startTraining(self, epochs, alpha, _lambda, keep_prob=0.5, interval=100):
@@ -29,10 +33,10 @@ def startTraining(self, epochs, alpha, _lambda, keep_prob=0.5, interval=100):
     """
     start = time.time()
     for i in range(epochs+1) : 
-    z,a = self._feedForward(keep_prob)
+        z,a = self._feedForward(keep_prob)
     delta = self._cost_derivative(a[-1])
     for l in range(1,len(z)) : 
-    delta_w = np.dot(delta, a[-l-1].T) + (_lambda)*self.W[-l]
+        delta_w = np.dot(delta, a[-l-1].T) + (_lambda)*self.W[-l]
     delta_b = np.sum(delta, axis=1, keepdims=True)
     delta = np.dot(self.W[-l].T, delta)*PHI_PRIME[self.ac_funcs[-l-1]](z[-l-1])
     self.W[-l] = self.W[-l] - (alpha/self.m)*delta_w
@@ -42,60 +46,65 @@ def startTraining(self, epochs, alpha, _lambda, keep_prob=0.5, interval=100):
     self.W[0] = self.W[0] - (alpha/self.m)*delta_w
     self.B[0] = self.B[0] - (alpha/self.m)*delta_b
     if not i%interval :
-    aa = self.predict(self.X)
+        aa = self.predict(self.X)
     if self.loss == 'b_ce':
-    aa = aa > 0.5
-    self.acc = sum(sum(aa == self.y)) / self.m
-    cost_val = self._cost_func(a[-1], _lambda)
-    self.cost.append(cost_val)
+        aa = aa > 0.5
+        self.acc = sum(sum(aa == self.y)) / self.m
+        cost_val = self._cost_func(a[-1], _lambda)
+        self.cost.append(cost_val)
     elif self.loss == 'c_ce':
-    aa = np.argmax(aa, axis = 0)
-    yy = np.argmax(self.y, axis = 0)
-    self.acc = np.sum(aa==yy)/(self.m)
-    cost_val = self._cost_func(a[-1], _lambda)
-    self.cost.append(cost_val)
+        aa = np.argmax(aa, axis = 0)
+        yy = np.argmax(self.y, axis = 0)
+        self.acc = np.sum(aa==yy)/(self.m)
+        cost_val = self._cost_func(a[-1], _lambda)
+        self.cost.append(cost_val)
+        
     sys.stdout.write(f'\rEpoch[{i}] : Cost = {cost_val:.2f} ; Acc = {(self.acc*100):.2f}% ; Time Taken = {(time.time()-start):.2f}s')
     print('\n')
     return None
 
 #激活函数python实现
 def sigmoid(z) :
- """ Reutrns the element wise sigmoid function. """
+    """ Returns the element wise sigmoid function. """
     return 1./(1 + np.exp(-z))
+
 def sigmoid_prime(z) :
- """ Returns the derivative of the sigmoid function. """
+    """ Returns the derivative of the sigmoid function. """
     return sigmoid(z)*(1-sigmoid(z))
 def ReLU(z) : 
- """ Reutrns the element wise ReLU function. """
+    """ Returns the element wise ReLU function. """
     return (z*(z > 0))
 def ReLU_prime(z) :
- """ Returns the derivative of the ReLU function. """
+    """ Returns the derivative of the ReLU function. """
     return 1*(z>=0)
 def lReLU(z) : 
- """ Reutrns the element wise leaky ReLU function. """
+    """ Returns the element wise leaky ReLU function. """
     return np.maximum(z/100,z)
 def lReLU_prime(z) :
- """ Returns the derivative of the leaky ReLU function. """
- z = 1*(z>=0)
- z[z==0] = 1/100
- return z
+    """ Returns the derivative of the leaky ReLU function. """
+    z = 1*(z>=0)
+    z[z==0] = 1/100
+    return z
 def tanh(z) :
- """ Reutrns the element wise hyperbolic tangent function. """
- return np.tanh(z)
-def tanh_prime(z) : 
- """ Returns the derivative of the tanh function. """
- return (1-tanh(z)**2)
+    """ Reutrns the element wise hyperbolic tangent function. """
+    return np.tanh(z)
+eps = 1e-8  # Define the value of "eps"
 
-#交叉熵损失函数的Python代码实现
+def tanh_prime(z) : 
+    """ Returns the derivative of the tanh function. """
+    return (1-tanh(z)**2)
+
+# 交叉熵损失函数的Python代码实现
 def binary_crossentropy(t,o):
     return -(t*tf.log(o+eps) + (1.0-t)*tf.log(1.0-o+eps))
 
-#Softmax函数的Python实现代码
+# Softmax函数的Python实现代码
 def softmax(x):
     exp_x = np.exp(x)
     return exp_x / np.sum(exp_x)
 
 #简单循环神经网络前向传播
+import numpy as np
 import numpy as np
  
 X = [1,2]
@@ -208,7 +217,14 @@ def top_diff_is(self, top_diff_h, top_diff_s):
         self.state.bottom_diff_s = ds * self.state.f
         self.state.bottom_diff_x = dxc[:self.param.x_dim]
         self.state.bottom_diff_h = dxc[self.param.x_dim:]
+
+#LSTM反向传播过程的Python实现代码
+wi_diff = np.zeros_like(wi_diff)
+wf_diff = np.zeros_like(wf_diff)
+wo_diff = np.zeros_like(wo_diff)
+wg_diff = np.zeros_like(wg_diff)
+
 wi_diff += np.outer((1.-i)*i*di, xc)
-wf_diff+= np.outer((1.-i)*i*df, xc)
-wo_diff+= np.outer((1.-i)*i*do, xc)
+wf_diff += np.outer((1.-i)*i*df, xc)
+wo_diff += np.outer((1.-i)*i*do, xc)
 wg_diff += np.outer((1.-i)*i*dg, xc)
