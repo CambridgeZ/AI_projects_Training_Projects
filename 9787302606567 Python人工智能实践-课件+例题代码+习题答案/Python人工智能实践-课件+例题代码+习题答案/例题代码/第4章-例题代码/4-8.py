@@ -1,0 +1,22 @@
+{
+    "name":"中国",
+    "continent":"Asia",
+    "municipality":[
+        {
+            "name":"北京",
+            "code":"010"
+        },
+        {
+            "name":"天津",
+            "code":"022"
+        },
+        {
+            "name":"上海",
+            "code":"021"
+        },
+        {
+            "name":"重庆",
+            "code":"023"
+        }
+    ]
+}

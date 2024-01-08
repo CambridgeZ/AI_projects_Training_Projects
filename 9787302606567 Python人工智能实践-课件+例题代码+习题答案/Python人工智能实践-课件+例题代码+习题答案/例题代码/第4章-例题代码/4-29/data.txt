@@ -1,0 +1,9 @@
+C,12.2
+Python,15.1
+Java,12.7
+C++,7.8
+C#,4.3
+VB.net,4.1
+Javascript,2.6
+PHP,1.4
+Other,39.8
