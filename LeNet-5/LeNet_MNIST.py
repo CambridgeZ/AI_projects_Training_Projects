@@ -183,6 +183,6 @@ model = build_LeNet5()
 model.summary()
 history = train_LeNet5(model,train_images,train_labels,test_images,test_labels)
 draw_history(history)
-label = use_LeNet5("mydigit.jpg", model)
+label = use_LeNet5("/Users/mac/Desktop/AI_projects/LeNet-5/mydigit.jpg", model)
 
 
